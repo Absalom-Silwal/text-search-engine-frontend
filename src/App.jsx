@@ -32,7 +32,7 @@ function App() {
         <ResultsList results={results} onResultClick={sendFeedback} />
         {
           results.items && results.items.length>0 && (
-           <Stack spacing={2} style={{"display":'flex',"justifyContent":'center'}}>
+           <Stack spacing={2} sx={{ alignItems: 'center' }}>
             <Pagination count={results.pages} variant="outlined" shape="rounded" defaultPage={results.page} onChange={handleChange} />
           </Stack>)
         }
