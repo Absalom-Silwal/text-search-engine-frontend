@@ -7,12 +7,12 @@ export const useSearch = () => {
   const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
 
-  const search = async (q) => {
+  const search = async (q,page=1) => {
     if (!q) return;
     setLoading(true);
     setQuery(q);
     try {
-      const response = await client.get(`/search?q=${q}`);
+      const response = await client.get(`/search?q=${q}&&page=${page}`);
       setResults(response.data);
       setError(null);
     } catch (err) {
@@ -23,7 +23,7 @@ export const useSearch = () => {
     }
   };
 
-  const sendFeedback = async (docId) => {
+  const sendFeedback = async (docId,link) => {
     try {
       await client.post('/feedback', {
         query: query,
@@ -31,6 +31,8 @@ export const useSearch = () => {
       });
       // Optionally re-search to show updated ranking immediately
       await search(query);
+      window.open(link, "_blank");
+
     } catch (err) {
       console.error('Feedback failed', err);
     }

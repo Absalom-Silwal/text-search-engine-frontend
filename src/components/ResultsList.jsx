@@ -6,7 +6,7 @@ const ResultsList = ({ results, onResultClick }) => {
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      {results.map((result) => (
+      {results.items.map((result) => (
         <ResultItem key={result.id} result={result} onClick={onResultClick} />
       ))}
     </div>

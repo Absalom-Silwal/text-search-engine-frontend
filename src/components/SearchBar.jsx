@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 
-const SearchBar = ({ onSearch }) => {
-  const [term, setTerm] = useState('');
+const SearchBar = ({ page,query,onSetQuery,onSearch }) => {
+ // const [term, setTerm] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch(term);
+    onSearch(query,page);
   };
 
   return (
     <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
       <input
         type="text"
-        value={term}
-        onChange={(e) => setTerm(e.target.value)}
+        value={query}
+        onChange={(e) => onSetQuery(e.target.value)}
         placeholder="Search documents..."
         style={{ padding: '10px', width: '300px', fontSize: '16px' }}
       />

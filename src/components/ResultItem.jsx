@@ -3,7 +3,7 @@ import React from 'react';
 const ResultItem = ({ result, onClick }) => {
   return (
     <div
-      onClick={() => onClick(result.id)}
+      onClick={() => onClick(result.id,result.link)}
       style={{
         border: '1px solid #ddd',
         padding: '15px',
