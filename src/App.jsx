@@ -19,7 +19,7 @@ function App() {
     <div style={{ padding: '40px', fontFamily: 'sans-serif' }}>
       <h1>🔍 Feedback Search Engine</h1>
       <p style={{ color: '#666', marginBottom: '30px' }}>
-        Ranking improves as you click on results! (BM25 + Click Boost)
+        Ranking improves as you click on results!
       </p>
       
       <SearchBar page={page} query={query} onSetQuery={handleSetQuery} onSearch={search} />
