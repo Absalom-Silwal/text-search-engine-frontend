@@ -21,6 +21,7 @@ function App() {
       <p style={{ color: '#666', marginBottom: '30px' }}>
         Ranking improves as you click on results!
       </p>
+      <p style={{ color: '#de5656', marginBottom: '30px' }}>Note: All data displayed in this application is synthetically generated and used solely for learning and demonstration purposes.</p>
       
       <SearchBar page={page} query={query} onSetQuery={handleSetQuery} onSearch={search} />
       
