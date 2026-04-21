@@ -31,7 +31,7 @@ export const useSearch = () => {
       });
       // Optionally re-search to show updated ranking immediately
       await search(query);
-      window.open(link, "_blank");
+      //window.open(link, "_blank");
 
     } catch (err) {
       console.error('Feedback failed', err);
