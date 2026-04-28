@@ -1,48 +1,77 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Header from './components/Header';
+import DisclaimerBanner from './components/DisclaimerBanner';
 import SearchBar from './components/SearchBar';
 import ResultsList from './components/ResultsList';
-import { useSearch } from './hooks/useSearch';
-import Pagination from '@mui/material/Pagination';
-import Stack from '@mui/material/Stack';
-function App() {
-  const { results, loading, error, search, sendFeedback } = useSearch();
-  const [page, setPage] = React.useState(1);
-  const [query, setQuery] = React.useState('');
-  const handleChange = (event, value) => {
-    setPage(value);
-    search(query,value)
-  };
-  const handleSetQuery = (query)=>{
-    setQuery(query)
-  }
-  return (
-    <div style={{ padding: '40px', fontFamily: 'sans-serif' }}>
-      <h1>🔍 Feedback Search Engine</h1>
-      <p style={{ color: '#666', marginBottom: '30px' }}>
-        Ranking improves as you click on results!
-      </p>
-      <p style={{ color: '#de5656', marginBottom: '30px' }}>Note: All data displayed in this application is synthetically generated and used solely for learning and demonstration purposes.</p>
-      
-      <SearchBar page={page} query={query} onSetQuery={handleSetQuery} onSearch={search} />
-      
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      
-      {!loading && !error && (
-        <div>
-        <ResultsList results={results} onResultClick={sendFeedback} />
-        {
-          results.items && results.items.length>0 && (
-           <Stack spacing={2} sx={{ alignItems: 'center' }}>
-            <Pagination count={results.pages} variant="outlined" shape="rounded" defaultPage={results.page} onChange={handleChange} />
-          </Stack>)
-        }
-        </div>
-        
-       
-        
+import Footer from './components/Footer';
+import { mockResults, defaultConfig } from './mockData';
 
-      )}
+const RESULTS_PER_PAGE = 3;
+
+function App() {
+  const [query, setQuery] = useState("");
+  const [searchedQuery, setSearchedQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [config] = useState(defaultConfig);
+
+  const doSearch = () => {
+    if (!query.trim()) return;
+    
+    const q = query.toLowerCase();
+    let filteredResults = mockResults.filter(r =>
+      r.title.toLowerCase().includes(q) || r.snippet.toLowerCase().includes(q)
+    );
+    
+    if (filteredResults.length === 0) {
+      filteredResults = mockResults;
+    }
+    
+    setResults(filteredResults);
+    setSearchedQuery(query);
+    setPage(1);
+    setHasSearched(true);
+  };
+
+  const getPageResults = () => {
+    const start = (page - 1) * RESULTS_PER_PAGE;
+    return results.slice(start, start + RESULTS_PER_PAGE);
+  };
+
+  const totalPages = Math.ceil(results.length / RESULTS_PER_PAGE);
+
+  return (
+    <div 
+      className="h-full w-full overflow-auto flex flex-col" 
+      style={{ 
+        backgroundColor: config.background_color,
+        color: config.text_color,
+        fontFamily: `${config.font_family}, DM Sans, sans-serif`
+      }}
+    >
+      <Header config={config} />
+      
+      <DisclaimerBanner config={config} />
+      
+      <SearchBar 
+        config={config} 
+        query={query} 
+        setQuery={setQuery} 
+        onSearch={doSearch} 
+      />
+      
+      <ResultsList 
+        config={config}
+        results={getPageResults()}
+        searchedQuery={searchedQuery}
+        hasSearched={hasSearched}
+        page={page}
+        totalPages={totalPages}
+        setPage={setPage}
+      />
+      
+      <Footer config={config} />
     </div>
   );
 }
