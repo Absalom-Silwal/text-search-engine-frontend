@@ -7,7 +7,6 @@ import Footer from './components/Footer';
 import { mockResults, defaultConfig } from './mockData';
 import client from './api/client';
 
-const RESULTS_PER_PAGE = 3;
 
 function App() {
   const [query, setQuery] = useState("");
@@ -24,7 +23,6 @@ function App() {
     const q = query.toLowerCase();
     try {
       const response = await client.get(`/search?q=${q}&&page=${changedPage?changedPage:page}`);
-      console.log('data',response.data)
       const  data = response.data
       setResults(data.items);
       setSearchedQuery(query);
@@ -37,10 +35,20 @@ function App() {
     } 
   };
 
-  // const changePage = (changedPage)=> {
-  //   doSearch(changePage)
-  // }
+    const sendFeedback = async (docId) => {
+    try {
+      await client.post('/feedback', {
+        query: query,
+        doc_id: docId
+      });
+      // Optionally re-search to show updated ranking immediately
+      await doSearch();
+      //window.open(link, "_blank");
 
+    } catch (err) {
+      console.error('Feedback failed', err);
+    }
+  };
 
 
   return (
@@ -72,6 +80,7 @@ function App() {
         totalPages={totalPages}
         setPage={setPage}
         changePage = {doSearch}
+        sendFeedback = {sendFeedback}
       />
       
       <Footer config={config} />

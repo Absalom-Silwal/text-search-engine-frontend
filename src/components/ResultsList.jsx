@@ -3,7 +3,7 @@ import ResultCard from './ResultCard';
 import Pagination from './Pagination';
 import { FileSearch } from 'lucide-react';
 
-const ResultsList = ({ config, results, searchedQuery, hasSearched, page, totalPages, setPage,changePage }) => {
+const ResultsList = ({ config, results, searchedQuery, hasSearched, page, totalPages, setPage,changePage,sendFeedback }) => {
   //console.log(results)
   const sz = config.font_size;
   const secondary = config.secondary_action;
@@ -37,7 +37,7 @@ const ResultsList = ({ config, results, searchedQuery, hasSearched, page, totalP
       </p>
       <div className="flex flex-col gap-4">
         {results.map(r => (
-          <ResultCard key={r.id} config={config} result={r} />
+          <ResultCard  key={r.id} config={config} result={r} sendFeedback={sendFeedback} />
         ))}
       </div>
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ResultCard = ({ config, result }) => {
+const ResultCard = ({config, result,sendFeedback }) => {
   const sz = config.font_size;
   const primary = config.primary_action;
   const secondary = config.secondary_action;
@@ -14,6 +14,7 @@ const ResultCard = ({ config, result }) => {
         border: '1px solid #e2e8f0', 
         boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
       }}
+      onClick={()=>{sendFeedback(result.id)}}
     >
       <h3 
         style={{
