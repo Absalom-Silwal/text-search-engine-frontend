@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Searchly</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'DM Sans', sans-serif; }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="h-full">
+  <div id="app" class="h-full w-full bg-slate-50 overflow-auto flex flex-col"></div>
+  <script>
+const mockResults = [
+  { id: 1, title: "Introduction to Information Retrieval", snippet: "A comprehensive guide covering the fundamentals of search engines, indexing strategies, and document ranking algorithms used in modern systems.", tfidf: 0.87, feedback: 0.12, final: 0.92 },
+  { id: 2, title: "Understanding TF-IDF Scoring", snippet: "Term Frequency–Inverse Document Frequency explained with practical examples and real-world applications in text mining and NLP pipelines.", tfidf: 0.79, feedback: 0.18, final: 0.88 },
+  { id: 3, title: "Relevance Feedback in Search Systems", snippet: "How user feedback loops improve search accuracy over time through implicit and explicit relevance signals from interaction data.", tfidf: 0.72, feedback: 0.25, final: 0.85 },
+  { id: 4, title: "Building Scalable Search Architectures", snippet: "Design patterns for distributed search infrastructure including sharding, replication, and query routing for high-throughput systems.", tfidf: 0.68, feedback: 0.15, final: 0.78 },
+  { id: 5, title: "Natural Language Processing for Search", snippet: "Leveraging NLP techniques such as tokenization, stemming, and semantic embeddings to enhance document retrieval quality.", tfidf: 0.65, feedback: 0.20, final: 0.76 },
+  { id: 6, title: "Evaluating Search Engine Performance", snippet: "Metrics and methodologies for measuring search quality including precision, recall, NDCG, and mean average precision.", tfidf: 0.61, feedback: 0.10, final: 0.68 },
+];
+
+const RESULTS_PER_PAGE = 3;
+
+let state = {
+  query: "",
+  searchedQuery: "",
+  results: [],
+  page: 1,
+  totalPages: 1,
+  hasSearched: false
+};
+
+const defaultConfig = {
+  app_title: "Searchly",
+  subtitle: "Feedback-Driven Search Engine",
+  disclaimer_text: "Note: All data displayed in this application is synthetically generated and used solely for learning and demonstration purposes.",
+  footer_text: "Built for learning purposes",
+  background_color: "#f8fafc",
+  surface_color: "#ffffff",
+  text_color: "#1e293b",
+  primary_action: "#2563eb",
+  secondary_action: "#64748b",
+  font_family: "DM Sans",
+  font_size: 16
+};
+
+function doSearch() {
+  if (!state.query.trim()) return;
+  const q = state.query.toLowerCase();
+  state.results = mockResults.filter(r =>
+    r.title.toLowerCase().includes(q) || r.snippet.toLowerCase().includes(q)
+  );
+  if (state.results.length === 0) state.results = mockResults;
+  state.searchedQuery = state.query;
+  state.page = 1;
+  state.totalPages = Math.ceil(state.results.length / RESULTS_PER_PAGE);
+  state.hasSearched = true;
+  render();
+}
+
+function getPageResults() {
+  const start = (state.page - 1) * RESULTS_PER_PAGE;
+  return state.results.slice(start, start + RESULTS_PER_PAGE);
+}
+
+function render() {
+  const cfg = window.elementSdk?.config || defaultConfig;
+  const font = cfg.font_family || defaultConfig.font_family;
+  const sz = cfg.font_size || defaultConfig.font_size;
+  const bg = cfg.background_color || defaultConfig.background_color;
+  const surface = cfg.surface_color || defaultConfig.surface_color;
+  const txt = cfg.text_color || defaultConfig.text_color;
+  const primary = cfg.primary_action || defaultConfig.primary_action;
+  const secondary = cfg.secondary_action || defaultConfig.secondary_action;
+
+  const app = document.getElementById("app");
+  app.style.backgroundColor = bg;
+  app.style.color = txt;
+  app.style.fontFamily = `${font}, DM Sans, sans-serif`;
+
+  const pageResults = state.hasSearched ? getPageResults() : [];
+
+  app.innerHTML = `
+    <!-- Header -->
+    <header class="pt-10 pb-4 text-center">
+      <h1 id="app-title" style="font-size:${sz * 2.2}px; color:${primary}; font-weight:700; letter-spacing:-0.5px;">${cfg.app_title || defaultConfig.app_title}</h1>
+      <p id="app-subtitle" style="font-size:${sz * 0.95}px; color:${secondary}; margin-top:4px;">${cfg.subtitle || defaultConfig.subtitle}</p>
+    </header>
+
+    <!-- Disclaimer -->
+    <div class="max-w-2xl mx-auto px-4 mb-6">
+      <div class="rounded-lg px-4 py-2.5" style="background:#fef9c3; border:1px solid #fde68a;">
+        <p id="disclaimer" style="font-size:${sz * 0.78}px; color:#92400e; text-align:center; line-height:1.5;">${cfg.disclaimer_text || defaultConfig.disclaimer_text}</p>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="max-w-2xl mx-auto px-4 mb-8">
+      <form id="search-form" class="flex gap-2">
+        <div class="flex-1 relative">
+          <i data-lucide="search" style="width:18px;height:18px;color:${secondary};position:absolute;left:14px;top:50%;transform:translateY(-50%);"></i>
+          <input id="search-input" type="text" placeholder="Search for documents..." value="${state.query}"
+            class="w-full rounded-xl pl-11 pr-4 py-3 outline-none transition-shadow"
+            style="font-size:${sz}px; background:${surface}; color:${txt}; border:1.5px solid #e2e8f0; box-shadow:0 1px 3px rgba(0,0,0,0.06);"
+            onfocus="this.style.borderColor='${primary}';this.style.boxShadow='0 0 0 3px ${primary}22'"
+            onblur="this.style.borderColor='#e2e8f0';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.06)'"
+          />
+        </div>
+        <button type="submit" class="rounded-xl px-6 py-3 font-semibold text-white transition-opacity hover:opacity-90 active:opacity-80 flex items-center gap-2"
+          style="background:${primary}; font-size:${sz * 0.9}px;">
+          <i data-lucide="search" style="width:16px;height:16px;"></i> Search
+        </button>
+      </form>
+    </div>
+
+    <!-- Results -->
+    <div class="max-w-2xl mx-auto px-4 flex-1">
+      ${state.hasSearched ? `
+        <p style="font-size:${sz * 0.82}px; color:${secondary}; margin-bottom:12px;">
+          ${state.results.length} result${state.results.length !== 1 ? 's' : ''} for "<strong style="color:${txt}">${state.searchedQuery}</strong>"
+        </p>
+        <div class="flex flex-col gap-4">
+          ${pageResults.map(r => `
+            <div class="rounded-xl p-5 transition-shadow hover:shadow-md" style="background:${surface}; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+              <h3 style="font-size:${sz * 1.1}px; font-weight:600; color:${primary}; margin-bottom:6px;">${r.title}</h3>
+              <p style="font-size:${sz * 0.88}px; color:${secondary}; line-height:1.6; margin-bottom:12px;">${r.snippet}</p>
+              <div class="flex flex-wrap gap-3">
+                <span class="rounded-md px-2.5 py-1" style="font-size:${sz * 0.72}px; background:#eff6ff; color:#1d4ed8;">TF-IDF: ${r.tfidf.toFixed(2)}</span>
+                <span class="rounded-md px-2.5 py-1" style="font-size:${sz * 0.72}px; background:#f0fdf4; color:#15803d;">Feedback: +${r.feedback.toFixed(2)}</span>
+                <span class="rounded-md px-2.5 py-1 font-semibold" style="font-size:${sz * 0.72}px; background:#faf5ff; color:#7e22ce;">Final: ${r.final.toFixed(2)}</span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+
+        ${state.totalPages > 1 ? `
+        <div class="flex justify-center items-center gap-4 mt-8 mb-4">
+          <button id="prev-btn" ${state.page <= 1 ? 'disabled' : ''} class="rounded-lg px-5 py-2 font-medium transition-opacity ${state.page <= 1 ? 'opacity-40 cursor-not-allowed' : 'hover:opacity-80'}"
+            style="background:${surface}; color:${txt}; border:1px solid #e2e8f0; font-size:${sz * 0.85}px;">
+            ← Previous
+          </button>
+          <span style="font-size:${sz * 0.82}px; color:${secondary};">Page ${state.page} of ${state.totalPages}</span>
+          <button id="next-btn" ${state.page >= state.totalPages ? 'disabled' : ''} class="rounded-lg px-5 py-2 font-medium transition-opacity ${state.page >= state.totalPages ? 'opacity-40 cursor-not-allowed' : 'hover:opacity-80'}"
+            style="background:${surface}; color:${txt}; border:1px solid #e2e8f0; font-size:${sz * 0.85}px;">
+            Next →
+          </button>
+        </div>
+        ` : ''}
+      ` : `
+        <div class="text-center py-16">
+          <i data-lucide="file-search" style="width:48px;height:48px;color:#cbd5e1;margin:0 auto 12px;display:block;"></i>
+          <p style="font-size:${sz * 0.95}px; color:${secondary};">Enter a query above to search documents</p>
+        </div>
+      `}
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 mt-auto">
+      <p id="footer-text" style="font-size:${sz * 0.78}px; color:${secondary};">${cfg.footer_text || defaultConfig.footer_text}</p>
+    </footer>
+  `;
+
+  lucide.createIcons();
+
+  document.getElementById("search-form").addEventListener("submit", e => {
+    e.preventDefault();
+    state.query = document.getElementById("search-input").value;
+    doSearch();
+  });
+
+  const prev = document.getElementById("prev-btn");
+  const next = document.getElementById("next-btn");
+  if (prev) prev.addEventListener("click", () => { if (state.page > 1) { state.page--; render(); } });
+  if (next) next.addEventListener("click", () => { if (state.page < state.totalPages) { state.page++; render(); } });
+}
+
+// window.elementSdk.init({
+//   defaultConfig,
+//   onConfigChange: async (config) => { render(); },
+//   mapToCapabilities: (config) => ({
+//     recolorables: [
+//       { get: () => config.background_color || defaultConfig.background_color, set: v => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+//       { get: () => config.surface_color || defaultConfig.surface_color, set: v => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+//       { get: () => config.text_color || defaultConfig.text_color, set: v => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+//       { get: () => config.primary_action || defaultConfig.primary_action, set: v => { config.primary_action = v; window.elementSdk.setConfig({ primary_action: v }); } },
+//       { get: () => config.secondary_action || defaultConfig.secondary_action, set: v => { config.secondary_action = v; window.elementSdk.setConfig({ secondary_action: v }); } },
+//     ],
+//     borderables: [],
+//     fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: v => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+//     fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: v => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); } },
+//   }),
+//   mapToEditPanelValues: (config) => new Map([
+//     ["app_title", config.app_title || defaultConfig.app_title],
+//     ["subtitle", config.subtitle || defaultConfig.subtitle],
+//     ["disclaimer_text", config.disclaimer_text || defaultConfig.disclaimer_text],
+//     ["footer_text", config.footer_text || defaultConfig.footer_text],
+//   ])
+// });
+
+render();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f35df3b70a9e7e4',t:'MTc3NzM3NzI2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
