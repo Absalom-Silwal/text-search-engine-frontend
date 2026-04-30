@@ -23,7 +23,7 @@ const ResultCard = ({ config, result }) => {
           marginBottom: '6px'
         }}
       >
-        {result.title}
+        {result?.title}
       </h3>
       <p 
         style={{
@@ -33,7 +33,7 @@ const ResultCard = ({ config, result }) => {
           marginBottom: '12px'
         }}
       >
-        {result.snippet}
+        {result?.snippet}
       </p>
       <div className="flex flex-wrap gap-3">
         <span 
@@ -44,7 +44,7 @@ const ResultCard = ({ config, result }) => {
             color: '#1d4ed8'
           }}
         >
-          TF-IDF: {result.tfidf.toFixed(2)}
+          TF-IDF: {result?.tfid?.toFixed(2)}
         </span>
         <span 
           className="rounded-md px-2.5 py-1" 
@@ -54,7 +54,7 @@ const ResultCard = ({ config, result }) => {
             color: '#15803d'
           }}
         >
-          Feedback: +{result.feedback.toFixed(2)}
+          Feedback: +{result?.feedback?.toFixed(2)}
         </span>
         <span 
           className="rounded-md px-2.5 py-1 font-semibold" 
@@ -64,7 +64,7 @@ const ResultCard = ({ config, result }) => {
             color: '#7e22ce'
           }}
         >
-          Final: {result.final.toFixed(2)}
+          Final: {result?.score?.toFixed(2)}
         </span>
       </div>
     </div>

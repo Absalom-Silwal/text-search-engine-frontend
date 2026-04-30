@@ -3,7 +3,8 @@ import ResultCard from './ResultCard';
 import Pagination from './Pagination';
 import { FileSearch } from 'lucide-react';
 
-const ResultsList = ({ config, results, searchedQuery, hasSearched, page, totalPages, setPage }) => {
+const ResultsList = ({ config, results, searchedQuery, hasSearched, page, totalPages, setPage,changePage }) => {
+  //console.log(results)
   const sz = config.font_size;
   const secondary = config.secondary_action;
   const txt = config.text_color;
@@ -45,7 +46,8 @@ const ResultsList = ({ config, results, searchedQuery, hasSearched, page, totalP
           config={config} 
           page={page} 
           totalPages={totalPages} 
-          onPageChange={setPage} 
+          onPageChange={changePage} 
+
         />
       )}
     </div>

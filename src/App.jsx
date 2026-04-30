@@ -5,6 +5,7 @@ import SearchBar from './components/SearchBar';
 import ResultsList from './components/ResultsList';
 import Footer from './components/Footer';
 import { mockResults, defaultConfig } from './mockData';
+import client from './api/client';
 
 const RESULTS_PER_PAGE = 3;
 
@@ -13,33 +14,34 @@ function App() {
   const [searchedQuery, setSearchedQuery] = useState("");
   const [results, setResults] = useState([]);
   const [page, setPage] = useState(1);
+  const [totalPages,setTotalPages] = useState(0);
   const [hasSearched, setHasSearched] = useState(false);
   const [config] = useState(defaultConfig);
 
-  const doSearch = () => {
+  const doSearch = async (changedPage=null) => {
     if (!query.trim()) return;
-    
+    console.log('changedPage',changedPage)
     const q = query.toLowerCase();
-    let filteredResults = mockResults.filter(r =>
-      r.title.toLowerCase().includes(q) || r.snippet.toLowerCase().includes(q)
-    );
-    
-    if (filteredResults.length === 0) {
-      filteredResults = mockResults;
-    }
-    
-    setResults(filteredResults);
-    setSearchedQuery(query);
-    setPage(1);
-    setHasSearched(true);
+    try {
+      const response = await client.get(`/search?q=${q}&&page=${changedPage?changedPage:page}`);
+      console.log('data',response.data)
+      const  data = response.data
+      setResults(data.items);
+      setSearchedQuery(query);
+      setPage(data.page);
+      setHasSearched(true);
+      setTotalPages(data.pages)
+    } catch (err) {
+      //setError('Search failed');
+      console.error(err);
+    } 
   };
 
-  const getPageResults = () => {
-    const start = (page - 1) * RESULTS_PER_PAGE;
-    return results.slice(start, start + RESULTS_PER_PAGE);
-  };
+  // const changePage = (changedPage)=> {
+  //   doSearch(changePage)
+  // }
 
-  const totalPages = Math.ceil(results.length / RESULTS_PER_PAGE);
+
 
   return (
     <div 
@@ -63,12 +65,13 @@ function App() {
       
       <ResultsList 
         config={config}
-        results={getPageResults()}
+        results={results}
         searchedQuery={searchedQuery}
         hasSearched={hasSearched}
         page={page}
         totalPages={totalPages}
         setPage={setPage}
+        changePage = {doSearch}
       />
       
       <Footer config={config} />
