@@ -19,7 +19,6 @@ function App() {
 
   const doSearch = async (changedPage=null) => {
     if (!query.trim()) return;
-    console.log('changedPage',changedPage)
     const q = query.toLowerCase();
     try {
       const response = await client.get(`/search?q=${q}&&page=${changedPage?changedPage:page}`);
