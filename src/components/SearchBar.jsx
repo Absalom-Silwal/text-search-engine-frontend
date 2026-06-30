@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 
-const SearchBar = ({ config, query, setQuery, onSearch }) => {
+const SearchBar = ({ config, query, setQuery, onSearch, loading }) => {
   const sz = config.font_size;
   const primary = config.primary_action;
   const secondary = config.secondary_action;
@@ -59,8 +59,13 @@ const SearchBar = ({ config, query, setQuery, onSearch }) => {
             background: primary, 
             fontSize: `${sz * 0.9}px`
           }}
+          disabled={loading}
         >
-          <Search style={{ width: '16px', height: '16px' }} /> Search
+          {loading ? (
+            <div className="w-4 h-4 border-t-2 border-b-2 border-white rounded-full animate-spin"></div>
+          ) : (
+             `Search`
+          )}
         </button>
       </form>
     </div>

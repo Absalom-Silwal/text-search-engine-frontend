@@ -16,10 +16,11 @@ function App() {
   const [totalPages,setTotalPages] = useState(0);
   const [hasSearched, setHasSearched] = useState(false);
   const [config] = useState(defaultConfig);
-
+  const [loading, setLoading] = useState(false);
   const doSearch = async (changedPage=null) => {
     if (!query.trim()) return;
     const q = query.toLowerCase();
+    setLoading(true);
     try {
       const response = await client.get(`/search?q=${q}&&page=${changedPage?changedPage:page}`);
       const  data = response.data
@@ -31,7 +32,9 @@ function App() {
     } catch (err) {
       //setError('Search failed');
       console.error(err);
-    } 
+    } finally {
+      setLoading(false);
+    }
   };
 
     const sendFeedback = async (docId) => {
@@ -68,6 +71,7 @@ function App() {
         query={query} 
         setQuery={setQuery} 
         onSearch={doSearch} 
+        loading={loading}
       />
       
       <ResultsList 
